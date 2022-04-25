@@ -21,8 +21,28 @@ public class AppManager {
 		return false;
 	}
 
+	public boolean login(PhoneNumber phoneNumberToCheck) {
+		AccountOwner accountOwner = getOwnerByPhoneNumber(phoneNumberToCheck);
+		if (accountOwner != null) {
+			currUser = accountOwner;
+			return true;
+		}
+
+		return false;
+	}
+
+	private AccountOwner getOwnerByPhoneNumber(PhoneNumber phoneNumberToCheck) {
+		AccountOwner accountOwner = null;
+		for (int i = 0; i < users.length; i++) {
+			if (phoneNumberToCheck.equals(users[i].getPhoneNumber())) {
+				accountOwner = users[i];
+			}
+		}
+		return accountOwner;
+	}
+
 	public void openAccount() {
-		
+
 	}
 
 	public void addAccountOwnerToArray(AccountOwner accountOwner) {
@@ -30,7 +50,4 @@ public class AppManager {
 		nextIndexAvaliableInUsersArray++;
 	}
 
-	public void login(PhoneNumber phoneNumber) {
-
-	}
 }
