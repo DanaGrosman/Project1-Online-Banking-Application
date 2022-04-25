@@ -10,11 +10,11 @@ import ajbcolionebankinkapp.users.Cerdetianls;
 import ajbcolionebankinkapp.users.PhoneNumber;
 
 public class AppManager {
-	protected final int NUM_OF_USERS = 100;
+	protected final static int NUM_OF_USERS = 100;
 	protected static int nextIndexAvaliableInUsersArray = 0;
 	protected Scanner scanner = new Scanner(System.in);
 	protected AccountOwner currUser;
-	protected AccountOwner[] users = new AccountOwner[NUM_OF_USERS];
+	public static AccountOwner[] users = new AccountOwner[NUM_OF_USERS];
 	protected BankManager bankManager;
 
 	public AppManager(BankManager bankManager) {
@@ -66,6 +66,9 @@ public class AppManager {
 		System.out.println("Birthday (yyyy/MM/dd format): ");
 		String birthday = scanner.nextLine();
 
+		firstName = handleName(firstName);
+		lastName = handleName(lastName);
+
 		LocalDate birthDate = handleBirthDate(birthday);
 		PhoneNumber phoneNumber = handlePhoneNumber(phone);
 
@@ -76,22 +79,44 @@ public class AppManager {
 
 		Cerdetianls cerdetianls = handleCerdetianls(username, password);
 
+		System.out.println("Monthly income: ");
+		double monthlyIncome = scanner.nextDouble();
+
 		AccountOwner accountOwnerToApprove = new AccountOwner(firstName, lastName, phoneNumber, birthDate, cerdetianls);
+		accountOwnerToApprove.setMonthlyIncome(monthlyIncome);
 
 		bankManager.addUserToApprove(accountOwnerToApprove);
+		users[nextIndexAvaliableInUsersArray] = accountOwnerToApprove;
+	}
 
+	private String handleName(String name) {
+		return name.replaceAll("\\d", "");
 	}
 
 	private Cerdetianls handleCerdetianls(String username, String password) {
-		boolean isUsernameAvailable = checkIfUsernameIsAvailable(username);
-
-		while (!isUsernameAvailable) {
-			System.out.println("Username is not available. \nPlease try another username: ");
+		String errUsername = checkUsername(username);
+		while (errUsername != "") {
+			System.out.println(errUsername);
 			username = scanner.nextLine();
-			isUsernameAvailable = checkIfUsernameIsAvailable(username);
+
+			errUsername = checkUsername(username);
+		}
+
+		while (!password.matches("^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]{4,8}$")) {
+			System.out.println(
+					"Password must have 4-8 chars and contains at least one digit and one letter. \nPlease enter new password: ");
+			password = scanner.nextLine();
 		}
 
 		return new Cerdetianls(username, password);
+	}
+
+	private String checkUsername(String username) {
+		if (!username.matches("[a-zA-Z0-9]*"))
+			return "Username must contains lettesr and digit only. \nPlease try another username: ";
+		else if (!checkIfUsernameIsAvailable(username))
+			return "Username is not available. \nPlease try another username: ";
+		return "";
 	}
 
 	private boolean checkIfUsernameIsAvailable(String username) {
@@ -133,4 +158,7 @@ public class AppManager {
 		nextIndexAvaliableInUsersArray++;
 	}
 
+	public AccountOwner[] getUsers() {
+		return users;
+	}
 }
