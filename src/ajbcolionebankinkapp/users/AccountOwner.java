@@ -32,7 +32,7 @@ public class AccountOwner extends Person {
 	public void setCerdetianls(Cerdetianls cerdetianls) {
 		this.cerdetianls = cerdetianls;
 	}
-	
+
 	public void setMonthlyIncome(double monthlyIncome) {
 		this.monthlyIncome = monthlyIncome;
 	}
@@ -47,11 +47,15 @@ public class AccountOwner extends Person {
 	}
 
 	public void deposit(double amount) {
-		double newBalance = account.getBalance() - amount;
-		account.setBalance(newBalance);
+		account.setBalance(account.getBalance() + amount);
 	}
-	
+
 	public void withdrawal(double amount) {
-		// TODO
+		if (amount < account.getAccountProperties().getMaxWithdrawal()) {
+			account.setBalance(account.getBalance() - amount);
+		} else {
+			System.out.printf("You can not withdraw more than %d NIS\n",
+					account.getAccountProperties().getMaxWithdrawal());
+		}
 	}
 }

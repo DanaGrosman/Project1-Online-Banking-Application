@@ -1,9 +1,11 @@
 package ajbcolionebankinkapp.users;
 
 import java.time.LocalDate;
+import java.util.Random;
 
 import ajbcolionebankinkapp.account.Account;
 import ajbcolionebankinkapp.appmanager.AppManager;
+import ajbcolionebankinkapp.enumaretion.AccountProperties;
 
 public class BankManager extends AccountOwner {
 	protected final int NUM_OF_USERS = 100;
@@ -33,12 +35,39 @@ public class BankManager extends AccountOwner {
 								.equals(usersToApprove[i].getCerdetianls().getUsername())) {
 							AppManager.users[j].setAccount(new Account());
 							AppManager.users[j].setAuthCode();
+							AccountProperties accountProperties = randAccountProperties();
+							AppManager.users[j].getAccount().setAccountProperties(accountProperties);
 							usersToApprove[i] = null;
 							return;
 						}
 					}
 			}
 		}
+	}
+
+	private AccountProperties randAccountProperties() {
+		AccountProperties accountProperties = null;
+		Random rand = new Random();
+		int randType = rand.nextInt(4);
+		switch (randType) {
+		case 0: {
+			accountProperties = AccountProperties.BRONZE;
+			break;
+		}
+		case 1: {
+			accountProperties = AccountProperties.GOLD;
+			break;
+		}
+		case 2: {
+			accountProperties = AccountProperties.SILVER;
+			break;
+		}
+		case 3: {
+			accountProperties = AccountProperties.TITANIUM;
+			break;
+		}
+		}
+		return accountProperties;
 	}
 
 }
