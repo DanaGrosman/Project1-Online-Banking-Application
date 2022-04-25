@@ -12,14 +12,16 @@ public class Runner {
 	public static void main(String[] args) {
 
 		Cerdetianls cerdetianlsAcc1 = new Cerdetianls("Bambi", "Dana");
-		AccountOwner acOwner1 = new AccountOwner("Dana", "Grosman", new PhoneNumber(052, 6998773),
+		AccountOwner acOwner1 = new AccountOwner("Dana", "Grosman", new PhoneNumber(52, 6998773),
 				LocalDate.of(1993, 1, 29), cerdetianlsAcc1);
 		
 		AppManager appManager = new AppManager();
 		appManager.addAccountOwnerToArray(acOwner1);
 		
-		boolean isLogin = appManager.login("Bambi", "Dana");
+		boolean isLoginByUsernameAndPass = appManager.login("Bambi", "Dana");
+		boolean isLoginByPhonenumber = appManager.login(new PhoneNumber(052, 6998773));
 
+		appManager.openAccount();
 	}
 
 }

@@ -1,7 +1,5 @@
 package ajbcolionebankinkapp.users;
 
-import java.util.Objects;
-
 public class PhoneNumber {
 	protected int prefix;
 	protected int number;
