@@ -13,7 +13,7 @@ public class AppManager {
 	protected final static int NUM_OF_USERS = 100;
 	protected static int nextIndexAvaliableInUsersArray = 0;
 	protected Scanner scanner = new Scanner(System.in);
-	protected AccountOwner currUser;
+	public AccountOwner currUser;
 	public static AccountOwner[] users = new AccountOwner[NUM_OF_USERS];
 	protected BankManager bankManager;
 
@@ -42,7 +42,7 @@ public class AppManager {
 		return false;
 	}
 
-	private AccountOwner getOwnerByPhoneNumber(PhoneNumber phoneNumberToCheck) {
+	public AccountOwner getOwnerByPhoneNumber(PhoneNumber phoneNumberToCheck) {
 		AccountOwner accountOwner = null;
 		for (int i = 0; i < nextIndexAvaliableInUsersArray; i++) {
 			if (phoneNumberToCheck.equals(users[i].getPhoneNumber())) {
@@ -139,19 +139,21 @@ public class AppManager {
 
 	private PhoneNumber handlePhoneNumber(String phone) {
 		boolean phoneIsExists = true;
-		PhoneNumber phoneNumber = new PhoneNumber(Integer.parseInt(phone.substring(0, 3)),
-				Integer.parseInt(phone.substring(3, 10)));
+		PhoneNumber phoneNumber = parseStringToPhonenumber(phone);
 		phoneIsExists = checkIfPhoneNumberIsAlreadyExists(phoneNumber);
 
 		while (phoneIsExists) {
 			System.out.println("PhoneNuber is already exists. \nPlease enter another phonenumber: ");
 			phone = scanner.nextLine();
-			phoneNumber = new PhoneNumber(Integer.parseInt(phone.substring(0, 3)),
-					Integer.parseInt(phone.substring(3, 10)));
+			phoneNumber = parseStringToPhonenumber(phone);
 			phoneIsExists = checkIfPhoneNumberIsAlreadyExists(phoneNumber);
 		}
 
 		return phoneNumber;
+	}
+
+	public PhoneNumber parseStringToPhonenumber(String phone) {
+		return new PhoneNumber(Integer.parseInt(phone.substring(0, 3)), Integer.parseInt(phone.substring(3, 10)));
 	}
 
 	private LocalDate handleBirthDate(String birthday) {

@@ -2,6 +2,7 @@ package ajbcolionebankinkapp.runner;
 
 public abstract class Menu {
 	// ACTIVITIES
+	public final static String CHECK_BALANCE = "Check balance";
 	public final static String DEPOSIT_CASH = "Deposit cash";
 	public final static String DEPOSIT_CHECK = "Deposit check";
 	public final static String WITHDRAWAL_CASH = "Withdrawal of cash";
@@ -21,6 +22,9 @@ public abstract class Menu {
 	public final static String LOGOUT = "Logout";
 	public final static String USERNAME = "Username";
 	public final static String PASSWORD = "Password";
+	public final static String LOGIN_WITH_USERNAME_AND_PASSWORD = "Login in with username and password";
+	public final static String LOGIN_WITH_PHONENUMBER = "Login in phonenumber";
+	public final static String USER_IS_BLOCKED = "The account is blockted for 30 minutes";
 
 	// OPEN ACCOUNT
 	public final static String FIRST_NAME = "First name";
@@ -30,15 +34,15 @@ public abstract class Menu {
 	public final static String MONTHLY_INCOME = "Monthly income";
 
 	public static void printMenu() {
-		System.out.println(MENU_START);
 		System.out.println(SELECTION_ACTIVITY);
-		System.out.println("1 - " + DEPOSIT_CASH);
-		System.out.println("2 - " + DEPOSIT_CHECK);
-		System.out.println("3 - " + WITHDRAWAL_CASH);
-		System.out.println("4 - " + PAY_BILL);
+		System.out.println("1 - " + CHECK_BALANCE);
+		System.out.println("2 - " + DEPOSIT_CASH);
+		System.out.println("3 - " + DEPOSIT_CHECK);
+		System.out.println("4 - " + WITHDRAWAL_CASH);
 		System.out.println("5 - " + TRANSFER_FUNDS);
-		System.out.println("6 - " + WITHDRAWAL_FEE_COLLECTION);
-		System.out.println("7 - " + LOGOUT);
+		System.out.println("6 - " + PAY_BILL);
+		System.out.println("7 - " + WITHDRAWAL_FEE_COLLECTION);
+		System.out.println("8 - " + LOGOUT);
 		System.out.println("0 - " + EXIT);
 	}
 
@@ -47,5 +51,10 @@ public abstract class Menu {
 		System.out.println(SELECTION_LOGIN_OR_OPEN_ACCOUNT);
 		System.out.println("1 - " + LOGIN);
 		System.out.println("2 - " + OPEN_ACCOUNT);
+	}
+
+	public static void printLoginOptions() {
+		System.out.println("1 - " + LOGIN_WITH_USERNAME_AND_PASSWORD);
+		System.out.println("2 - " + LOGIN_WITH_PHONENUMBER);
 	}
 }
