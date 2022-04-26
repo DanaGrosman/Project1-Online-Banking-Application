@@ -13,7 +13,7 @@ public class AppManager {
 	protected final static int NUM_OF_USERS = 100;
 	protected static int nextIndexAvaliableInUsersArray = 0;
 	protected Scanner scanner = new Scanner(System.in);
-	public AccountOwner currUser;
+	protected AccountOwner currUser;
 	public static AccountOwner[] users = new AccountOwner[NUM_OF_USERS];
 	protected BankManager bankManager;
 
@@ -26,7 +26,7 @@ public class AppManager {
 		Cerdetianls cerdetianlsToCheck = new Cerdetianls(username, password);
 		for (int i = 0; i < nextIndexAvaliableInUsersArray; i++) {
 			if (cerdetianlsToCheck.equals(users[i].getCerdetianls())) {
-				currUser = users[i];
+				setCurrUser(users[i]);
 				return true;
 			}
 		}
@@ -36,7 +36,7 @@ public class AppManager {
 	public boolean login(PhoneNumber phoneNumberToCheck) {
 		AccountOwner accountOwner = getOwnerByPhoneNumber(phoneNumberToCheck);
 		if (accountOwner != null) {
-			currUser = accountOwner;
+			setCurrUser(accountOwner);
 			return true;
 		}
 		return false;
@@ -52,8 +52,17 @@ public class AppManager {
 		return accountOwner;
 	}
 
+	public AccountOwner getCurrUser() {
+		return currUser;
+	}
+
+	public void setCurrUser(AccountOwner currUser) {
+		this.currUser = currUser;
+	}
+
 	public void logout() {
-		currUser = null;
+		setCurrUser(null);
+		;
 	}
 
 	public void openAccount() {
@@ -89,6 +98,7 @@ public class AppManager {
 		bankManager.addUserToApprove(accountOwnerToApprove);
 		users[nextIndexAvaliableInUsersArray] = accountOwnerToApprove;
 		nextIndexAvaliableInUsersArray++;
+
 	}
 
 	private double handleMonthlyIncome(double monthlyIncome) {

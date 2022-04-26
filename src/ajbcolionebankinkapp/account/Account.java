@@ -1,7 +1,6 @@
 package ajbcolionebankinkapp.account;
 
 import java.time.LocalDateTime;
-import java.util.Iterator;
 
 import ajbcolionebankinkapp.enumaretion.AccountProperties;
 import ajbcolionebankinkapp.enumaretion.ActivityName;
@@ -11,7 +10,7 @@ public class Account {
 	protected double balance;
 	protected AccountProperties accountProperties;
 	protected ActivityData[] history = new ActivityData[MAX_ACTIVITY_DATA];
-	protected static int indexOfNextActivityData = 0;
+	protected int indexOfNextActivityData = 0;
 
 	public double getBalance() {
 		return balance;

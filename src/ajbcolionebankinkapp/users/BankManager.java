@@ -1,11 +1,13 @@
 package ajbcolionebankinkapp.users;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Random;
 
 import ajbcolionebankinkapp.account.Account;
 import ajbcolionebankinkapp.appmanager.AppManager;
 import ajbcolionebankinkapp.enumaretion.AccountProperties;
+import ajbcolionebankinkapp.enumaretion.ActivityName;
 
 public class BankManager extends AccountOwner {
 	protected final int NUM_OF_USERS = 100;
@@ -36,6 +38,8 @@ public class BankManager extends AccountOwner {
 							AppManager.users[j].setAccount(new Account());
 							AccountProperties accountProperties = randAccountProperties();
 							AppManager.users[j].getAccount().setAccountProperties(accountProperties);
+							AppManager.users[j].getAccount().addActivityData(ActivityName.OPEN_ACCOUNT, 0,
+									LocalDateTime.now(), "Open account - approved by bank manager");
 							usersToApprove[i] = null;
 							return;
 						}

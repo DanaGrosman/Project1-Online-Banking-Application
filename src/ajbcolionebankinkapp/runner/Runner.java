@@ -79,7 +79,7 @@ public class Runner {
 
 	private static void handleMenu() {
 		Menu.printMenu();
-		if (bankDB.appManager.currUser.equals(bankDB.bankManager))
+		if (bankDB.appManager.getCurrUser().equals(bankDB.bankManager))
 			Menu.printBankManagerMenu();
 
 		selection = scanner.nextInt();
@@ -127,38 +127,43 @@ public class Runner {
 			}
 			}
 			Menu.printMenu();
-			if (bankDB.appManager.currUser.equals(bankDB.bankManager))
+			if (bankDB.appManager.getCurrUser().equals(bankDB.bankManager))
 				Menu.printBankManagerMenu();
 			selection = scanner.nextInt();
 		}
 	}
 
 	private static void handleGetReport() {
-		bankDB.appManager.currUser.getAccount().printHistory();
+		bankDB.appManager.getCurrUser().getAccount().printHistory();
 	}
 
 	private static void handleCheckBalance() {
-		System.out.println("Balance: " + bankDB.appManager.currUser.checkBalance());	
+		System.out.println("Balance: " + bankDB.appManager.getCurrUser().checkBalance());
 	}
 
 	private static void handleWithdrawal() {
 		System.out.println("Amount: ");
 		double amount = scanner.nextDouble();
-		bankDB.appManager.currUser.withdrawal(amount);
+		bankDB.appManager.getCurrUser().withdrawal(amount);
 		System.out.println("Withdrawal succeeded!");
-		System.out.println("Your new balance: " + bankDB.appManager.currUser.checkBalance());		
+		System.out.println("Your new balance: " + bankDB.appManager.getCurrUser().checkBalance());
+		bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.WITHDRAWAL, amount, LocalDateTime.now(),
+				"Succeeded");
 	}
 
 	private static void handleDesposit() {
 		System.out.println("Amount: ");
 		double amount = scanner.nextDouble();
-		bankDB.appManager.currUser.deposit(amount);
+		bankDB.appManager.getCurrUser().deposit(amount);
 		System.out.println("Deposit succeeded!");
-		System.out.println("Your new balance: " + bankDB.appManager.currUser.checkBalance());	
-		bankDB.appManager.currUser.getAccount().addActivityData(ActivityName.DEPOSIT, amount, LocalDateTime.now(), "Succeeded");
+		System.out.println("Your new balance: " + bankDB.appManager.getCurrUser().checkBalance());
+		bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.DEPOSIT, amount, LocalDateTime.now(),
+				"Succeeded");
 	}
 
 	private static void handlePayBill() {
+		String target = "";
+
 		Menu.printPayBillOptions();
 		int selection = scanner.nextInt();
 
@@ -171,24 +176,32 @@ public class Runner {
 		switch (selection) {
 		case 1: { // BANK
 			bankDB.bankManager.deposit(amount);
-			bankDB.appManager.currUser.withdrawal(amount);
-			System.out.println("Pay bill succeeded!");
-			System.out.println("Balance: " + bankDB.appManager.currUser.checkBalance());
+			target = "Bank";
 			break;
 		}
-		case 2: // PHONE_COMPANY
-		case 3: // WATER_COMPANY
+		case 2: { // PHONE_COMPANY
+			target = "Phone company";
+			break;
+		}
+		case 3: {// WATER_COMPANY
+			target = "Water company";
+			break;
+		}
 		case 4: { // ELECTRIC_COMPANY
-			bankDB.appManager.currUser.withdrawal(amount);
-			System.out.println("Pay bill succeeded!");
-			System.out.println("Balance: " + bankDB.appManager.currUser.checkBalance());
+			target = "Electric company";
 			break;
 		}
 		}
 
+		bankDB.appManager.getCurrUser().withdrawal(amount);
+		System.out.printf("Pay bill to %s succeeded!\n", target);
+		System.out.println("Balance: " + bankDB.appManager.getCurrUser().checkBalance());
+		bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.PAY_BILL, amount,
+				LocalDateTime.now(), "Pay bill to " + target + " succeeded");
 	}
 
 	private static void handleTransferFunds() {
+		String activityInfo = "";
 		System.out.println("Reciving user phone number: ");
 		String phone = scanner.next();
 		PhoneNumber phoneNumber = bankDB.appManager.parseStringToPhonenumber(phone);
@@ -197,18 +210,27 @@ public class Runner {
 		double amount = scanner.nextDouble();
 		if (amount > MAX_AMOUNT_TO_TRANSFER) {
 			System.out.println("The maximum amount that can be transferred is " + MAX_AMOUNT_TO_TRANSFER);
+			activityInfo = "Failed to transfer funds - over the maximum amount";
+			bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.TRANSFER, amount,
+					LocalDateTime.now(), activityInfo);
 			return;
 		}
 
 		AccountOwner accountOwnerTarget = bankDB.appManager.getOwnerByPhoneNumber(phoneNumber);
 		if (accountOwnerTarget == null) {
 			System.out.println("The phone number dosent found");
+			activityInfo = "Failed to transfer funds - Phone number dosen't found";
+			bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.TRANSFER, amount,
+					LocalDateTime.now(), activityInfo);
 			return;
 		} else {
-			bankDB.appManager.currUser.deposit(amount);
-			accountOwnerTarget.withdrawal(amount);
+			bankDB.appManager.getCurrUser().withdrawal(amount);
+			accountOwnerTarget.deposit(amount);
 			System.out.println("Transfer succeeded!");
-			System.out.println("Your new balance: " + bankDB.appManager.currUser.checkBalance());
+			System.out.println("Your new balance: " + bankDB.appManager.getCurrUser().checkBalance());
+			activityInfo = "Transfer funds to " + phone + " succeeded";
+			bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.TRANSFER, amount,
+					LocalDateTime.now(), activityInfo);
 		}
 	}
 }
