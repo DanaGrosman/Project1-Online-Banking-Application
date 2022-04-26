@@ -44,8 +44,8 @@ public class Account {
 	}
 
 	public void printHistory() {
-		for (int i = 0;i < indexOfNextActivityData;i++) {
-			history[i].toString();
+		for (int i = 0; i < indexOfNextActivityData; i++) {
+			System.out.println(history[i].toString());
 		}
 	}
 }
