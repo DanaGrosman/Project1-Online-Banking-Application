@@ -47,4 +47,10 @@ public class Account {
 			System.out.println(history[i].toString());
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "Account [balance=" + balance + ", accountProperties=" + accountProperties + "]";
+	}
+	
 }

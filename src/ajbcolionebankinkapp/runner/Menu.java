@@ -11,6 +11,7 @@ public abstract class Menu {
 	public final static String GET_LOAN = "Get Loan";
 	public final static String GET_REPORT = "Get report";
 	public final static String OPEN_ACCOUNT = "Open account";
+	public final static String ACCOUNT_DETAILS = "Account details";
 	public final static String EXIT = "Exit";
 
 	// MENU
@@ -56,6 +57,7 @@ public abstract class Menu {
 		System.out.println("7 - " + GET_LOAN);
 		System.out.println("8 - " + GET_REPORT);
 		System.out.println("9 - " + LOGOUT);
+		System.out.println("10 - " + ACCOUNT_DETAILS);
 		System.out.println("0 - " + EXIT);
 	}
 
@@ -72,7 +74,7 @@ public abstract class Menu {
 	}
 	
 	public static void printBankManagerMenu() {
-		System.out.println("10 - " + APPROVE_NEW_ACCOUNTS);
+		System.out.println("11 - " + APPROVE_NEW_ACCOUNTS);
 	}
 	
 	public static void printPayBillOptions() {

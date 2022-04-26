@@ -115,12 +115,16 @@ public class Runner {
 			}
 			case 9: { // LOGOUT
 				bankDB.appManager.logout();
-				return;
+				break;
+			}
+			case 10: { // ACCOUNT_DETAILS
+				handleAccountDetails();
+				break;
 			}
 			case 0: { // EXIT
 				break;
 			}
-			case 10: { // APPROVE_NEW_ACCOUNTS
+			case 11: { // APPROVE_NEW_ACCOUNTS
 				bankDB.bankManager.setAndApproveAcc();
 				System.out.println("Approval new accounts successfully");
 				break;
@@ -131,6 +135,11 @@ public class Runner {
 				Menu.printBankManagerMenu();
 			selection = scanner.nextInt();
 		}
+	}
+
+	private static void handleAccountDetails() {
+		System.out.println(bankDB.appManager.getCurrUser().toString());
+		System.out.println(bankDB.appManager.getCurrUser().getAccount().toString());
 	}
 
 	private static void handleGetLoan() {
@@ -153,10 +162,14 @@ public class Runner {
 			System.out.println("Monthly payment return: " + monthlyPaymentReturn);
 			bankDB.bankManager.withdrawal(amount);
 			bankDB.appManager.getCurrUser().deposit(amount);
+			bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.DEPOSIT, amount,
+					LocalDateTime.now(), "Get loan");
+			bankDB.bankManager.getAccount().addActivityData(ActivityName.WITHDRAWAL, amount, LocalDateTime.now(),
+					"Give loan");
 			activityInfo = "Get loan succeeded";
 		}
 		System.out.println(activityInfo);
-		bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.TRANSFER, amount, LocalDateTime.now(),
+		bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.GET_LOAN, amount, LocalDateTime.now(),
 				activityInfo);
 	}
 
@@ -170,18 +183,19 @@ public class Runner {
 
 	private static void handleWithdrawal() {
 		String activityInfo = "";
+
 		System.out.println("Amount: ");
 		double amount = scanner.nextDouble();
 
-		if (amount <= bankDB.appManager.getCurrUser().getAccount().getAccountProperties().getMaxWithdrawal()) {
+		double maxWithdrawal = bankDB.appManager.getCurrUser().getAccount().getAccountProperties().getMaxWithdrawal();
+		if (amount <= maxWithdrawal || maxWithdrawal == 0) {
 			bankDB.appManager.getCurrUser().withdrawal(amount);
-			System.out.println("Withdrawal succeeded!");
 			System.out.println("Your new balance: " + bankDB.appManager.getCurrUser().checkBalance());
 			activityInfo = "Withdrawal succeeded";
-
 		} else {
 			activityInfo = "Withdrawal failed - over the daily maximum withdrawal";
 		}
+		System.out.println(activityInfo);
 		bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.WITHDRAWAL, amount,
 				LocalDateTime.now(), activityInfo);
 	}

@@ -51,12 +51,12 @@ public class AccountOwner extends Person {
 	}
 
 	public void withdrawal(double amount) {
-		if (amount < account.getAccountProperties().getMaxWithdrawal()
-				|| account.getAccountProperties().getMaxWithdrawal() == 0) {
-			account.setBalance(account.getBalance() - amount);
-		} else {
-			System.out.printf("You can not withdrawl more than %f NIS\n",
-					account.getAccountProperties().getMaxWithdrawal());
-		}
+		account.setBalance(account.getBalance() - amount);
+	}
+
+	@Override
+	public String toString() {
+		return "AccountOwner [monthlyIncome=" + monthlyIncome + ", firstName=" + firstName + ", lastName=" + lastName
+				+ ", birthDate=" + birthDate + "]";
 	}
 }
