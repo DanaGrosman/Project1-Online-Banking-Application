@@ -128,7 +128,6 @@ public class AppManager {
 					"Password must have 4-8 chars and contains at least one digit and one letter. \nPlease enter new password: ");
 			password = scanner.nextLine();
 		}
-
 		return new Cerdetianls(username, password);
 	}
 
