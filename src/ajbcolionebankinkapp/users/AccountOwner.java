@@ -9,7 +9,6 @@ public class AccountOwner extends Person {
 	protected Account account;
 	protected Cerdetianls cerdetianls;
 	protected double monthlyIncome;
-	protected int authCode;
 
 	public AccountOwner(String firstName, String lastName, PhoneNumber phoneNumber, LocalDate birthDate,
 			Cerdetianls cerdetianls) {
@@ -41,9 +40,10 @@ public class AccountOwner extends Person {
 		return account.getBalance();
 	}
 
-	public void setAuthCode() {
+	public int setAuthCode() {
 		Random rand = new Random();
-		authCode = rand.nextInt(10000) + 1000;
+		int authCode = rand.nextInt(10000) + 1000;
+		return authCode;
 	}
 
 	public void deposit(double amount) {

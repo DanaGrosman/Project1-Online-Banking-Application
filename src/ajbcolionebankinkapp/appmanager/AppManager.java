@@ -81,12 +81,22 @@ public class AppManager {
 
 		System.out.println("Monthly income: ");
 		double monthlyIncome = scanner.nextDouble();
+		monthlyIncome = handleMonthlyIncome(monthlyIncome);
 
 		AccountOwner accountOwnerToApprove = new AccountOwner(firstName, lastName, phoneNumber, birthDate, cerdetianls);
 		accountOwnerToApprove.setMonthlyIncome(monthlyIncome);
 
 		bankManager.addUserToApprove(accountOwnerToApprove);
 		users[nextIndexAvaliableInUsersArray] = accountOwnerToApprove;
+	}
+
+	private double handleMonthlyIncome(double monthlyIncome) {
+		while (monthlyIncome < 0) {
+			System.out.println("Monthly income must be >= 0. Please try again: ");
+			monthlyIncome = scanner.nextDouble();
+		}
+
+		return monthlyIncome;
 	}
 
 	private String handleName(String name) {

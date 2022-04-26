@@ -34,7 +34,6 @@ public class BankManager extends AccountOwner {
 						if (AppManager.users[j].getCerdetianls().getUsername()
 								.equals(usersToApprove[i].getCerdetianls().getUsername())) {
 							AppManager.users[j].setAccount(new Account());
-							AppManager.users[j].setAuthCode();
 							AccountProperties accountProperties = randAccountProperties();
 							AppManager.users[j].getAccount().setAccountProperties(accountProperties);
 							usersToApprove[i] = null;

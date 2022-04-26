@@ -28,5 +28,4 @@ public enum AccountProperties {
 	public double getMaxWithdrawal() {
 		return maxWithdrawal;
 	}
-
 }
