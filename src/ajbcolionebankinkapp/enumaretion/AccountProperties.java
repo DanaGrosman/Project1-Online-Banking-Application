@@ -28,4 +28,13 @@ public enum AccountProperties {
 	public double getMaxWithdrawal() {
 		return maxWithdrawal;
 	}
+	
+	public double getInterestRateMin() {
+		return interestRateMin;
+	}
+
+	public double getOperationFeeMax() {
+		return operationFeeMax;
+	}
+	
 }

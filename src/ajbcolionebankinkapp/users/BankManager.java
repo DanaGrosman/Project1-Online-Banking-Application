@@ -16,6 +16,8 @@ public class BankManager extends AccountOwner {
 	public BankManager(String firstName, String lastName, PhoneNumber phoneNumber, LocalDate birthDate,
 			Cerdetianls cerdetianls) {
 		super(firstName, lastName, phoneNumber, birthDate, cerdetianls);
+		setAccount(new Account());
+		getAccount().setAccountProperties(AccountProperties.TITANIUM);
 	}
 
 	public void addUserToApprove(AccountOwner accountOwnerToApprove) {

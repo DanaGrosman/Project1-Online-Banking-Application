@@ -3,7 +3,6 @@ package ajbcolionebankinkapp.runner;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 
-import ajbcolionebankinkapp.account.Account;
 import ajbcolionebankinkapp.enumaretion.ActivityName;
 import ajbcolionebankinkapp.users.AccountOwner;
 import ajbcolionebankinkapp.users.PhoneNumber;
@@ -14,6 +13,7 @@ public class Runner {
 	protected static int selection = -1;
 	protected static final int MAX_AMOUNT_TO_TRANSFER = 2000;
 	protected static final int MAX_AMOUNT_TO_PAY_BILL = 5000;
+	protected static final int MAX_MONTHLY_PAYMENT = 6;
 
 	public static void main(String[] args) {
 		String username, password, phonenumber;
@@ -24,7 +24,6 @@ public class Runner {
 		bankDB.appManager.addAccountOwnerToArray(bankDB.acOwner1);
 		bankDB.appManager.addAccountOwnerToArray(bankDB.bankManager);
 		bankDB.bankManager.setAndApproveAcc();
-		bankDB.bankManager.setAccount(new Account());
 
 		Menu.printLogin();
 		selection = scanner.nextInt();
@@ -107,6 +106,7 @@ public class Runner {
 				break;
 			}
 			case 7: { // GET_LOAN
+				handleGetLoan();
 				break;
 			}
 			case 8: { // GET_REPORT
@@ -133,6 +133,33 @@ public class Runner {
 		}
 	}
 
+	private static void handleGetLoan() {
+		String activityInfo = "";
+
+		System.out.println("Loan amount: ");
+		double amount = scanner.nextDouble();
+		System.out.println("Monthly payments: ");
+		int monthlyPayments = scanner.nextInt();
+
+		double maxLoanAmount = bankDB.appManager.getCurrUser().getAccount().getAccountProperties().getMaxLoan();
+		if (amount > maxLoanAmount && maxLoanAmount != 0) {
+			activityInfo = "Failed to get loan - over the maximum amount";
+		} else if (monthlyPayments > MAX_MONTHLY_PAYMENT) {
+			activityInfo = "Failed to get loan - over the maximum monthly payment";
+		} else {
+			double interestRate = bankDB.appManager.getCurrUser().getAccount().getAccountProperties()
+					.getInterestRateMin();
+			double monthlyPaymentReturn = ((amount * (interestRate / 100)) + amount) / monthlyPayments;
+			System.out.println("Monthly payment return: " + monthlyPaymentReturn);
+			bankDB.bankManager.withdrawal(amount);
+			bankDB.appManager.getCurrUser().deposit(amount);
+			activityInfo = "Get loan succeeded";
+		}
+		System.out.println(activityInfo);
+		bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.TRANSFER, amount, LocalDateTime.now(),
+				activityInfo);
+	}
+
 	private static void handleGetReport() {
 		bankDB.appManager.getCurrUser().getAccount().printHistory();
 	}
@@ -142,13 +169,21 @@ public class Runner {
 	}
 
 	private static void handleWithdrawal() {
+		String activityInfo = "";
 		System.out.println("Amount: ");
 		double amount = scanner.nextDouble();
-		bankDB.appManager.getCurrUser().withdrawal(amount);
-		System.out.println("Withdrawal succeeded!");
-		System.out.println("Your new balance: " + bankDB.appManager.getCurrUser().checkBalance());
-		bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.WITHDRAWAL, amount, LocalDateTime.now(),
-				"Succeeded");
+
+		if (amount <= bankDB.appManager.getCurrUser().getAccount().getAccountProperties().getMaxWithdrawal()) {
+			bankDB.appManager.getCurrUser().withdrawal(amount);
+			System.out.println("Withdrawal succeeded!");
+			System.out.println("Your new balance: " + bankDB.appManager.getCurrUser().checkBalance());
+			activityInfo = "Withdrawal succeeded";
+
+		} else {
+			activityInfo = "Withdrawal failed - over the daily maximum withdrawal";
+		}
+		bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.WITHDRAWAL, amount,
+				LocalDateTime.now(), activityInfo);
 	}
 
 	private static void handleDesposit() {
@@ -196,41 +231,40 @@ public class Runner {
 		bankDB.appManager.getCurrUser().withdrawal(amount);
 		System.out.printf("Pay bill to %s succeeded!\n", target);
 		System.out.println("Balance: " + bankDB.appManager.getCurrUser().checkBalance());
-		bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.PAY_BILL, amount,
-				LocalDateTime.now(), "Pay bill to " + target + " succeeded");
+		bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.PAY_BILL, amount, LocalDateTime.now(),
+				"Pay bill to " + target + " succeeded");
 	}
 
 	private static void handleTransferFunds() {
 		String activityInfo = "";
+		String output = "";
+
 		System.out.println("Reciving user phone number: ");
 		String phone = scanner.next();
 		PhoneNumber phoneNumber = bankDB.appManager.parseStringToPhonenumber(phone);
 
 		System.out.println("Amount: ");
 		double amount = scanner.nextDouble();
+
 		if (amount > MAX_AMOUNT_TO_TRANSFER) {
-			System.out.println("The maximum amount that can be transferred is " + MAX_AMOUNT_TO_TRANSFER);
+			output = "The maximum amount that can be transferred is " + MAX_AMOUNT_TO_TRANSFER;
 			activityInfo = "Failed to transfer funds - over the maximum amount";
-			bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.TRANSFER, amount,
-					LocalDateTime.now(), activityInfo);
-			return;
 		}
 
 		AccountOwner accountOwnerTarget = bankDB.appManager.getOwnerByPhoneNumber(phoneNumber);
 		if (accountOwnerTarget == null) {
-			System.out.println("The phone number dosent found");
+			output = "The phone number dosent found";
 			activityInfo = "Failed to transfer funds - Phone number dosen't found";
-			bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.TRANSFER, amount,
-					LocalDateTime.now(), activityInfo);
-			return;
 		} else {
 			bankDB.appManager.getCurrUser().withdrawal(amount);
 			accountOwnerTarget.deposit(amount);
-			System.out.println("Transfer succeeded!");
+			output = "Transfer succeeded!";
 			System.out.println("Your new balance: " + bankDB.appManager.getCurrUser().checkBalance());
 			activityInfo = "Transfer funds to " + phone + " succeeded";
-			bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.TRANSFER, amount,
-					LocalDateTime.now(), activityInfo);
 		}
+
+		System.out.println(output);
+		bankDB.appManager.getCurrUser().getAccount().addActivityData(ActivityName.TRANSFER, amount, LocalDateTime.now(),
+				activityInfo);
 	}
 }
