@@ -71,6 +71,7 @@ public class Runner {
 				break;
 			}
 			}
+
 			Menu.printLogin();
 			selection = scanner.nextInt();
 		}

@@ -65,7 +65,7 @@ public class AppManager {
 		;
 	}
 
-	public void openAccount() {
+	public boolean openAccount() {
 		System.out.println("First name: ");
 		String firstName = scanner.nextLine();
 		System.out.println("Last name: ");
@@ -98,7 +98,7 @@ public class AppManager {
 		bankManager.addUserToApprove(accountOwnerToApprove);
 		users[nextIndexAvaliableInUsersArray] = accountOwnerToApprove;
 		nextIndexAvaliableInUsersArray++;
-
+		return true;
 	}
 
 	private double handleMonthlyIncome(double monthlyIncome) {
@@ -135,14 +135,15 @@ public class AppManager {
 	private String checkUsername(String username) {
 		if (!username.matches("[a-zA-Z0-9]*"))
 			return "Username must contains lettesr and digit only. \nPlease try another username: ";
-		else if (!checkIfUsernameIsAvailable(username))
+		else if (!checkIfUsernameIsAvailable(username)) {
 			return "Username is not available. \nPlease try another username: ";
+		}
 		return "";
 	}
 
 	private boolean checkIfUsernameIsAvailable(String username) {
 		for (int i = 0; i < nextIndexAvaliableInUsersArray; i++) {
-			if (username == users[i].getCerdetianls().getUsername())
+			if (username.equals(users[i].getCerdetianls().getUsername()))
 				return false;
 		}
 		return true;
