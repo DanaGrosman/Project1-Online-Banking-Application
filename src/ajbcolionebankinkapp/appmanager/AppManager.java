@@ -88,6 +88,7 @@ public class AppManager {
 
 		bankManager.addUserToApprove(accountOwnerToApprove);
 		users[nextIndexAvaliableInUsersArray] = accountOwnerToApprove;
+		nextIndexAvaliableInUsersArray++;
 	}
 
 	private double handleMonthlyIncome(double monthlyIncome) {

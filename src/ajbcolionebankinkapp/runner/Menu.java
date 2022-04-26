@@ -32,7 +32,18 @@ public abstract class Menu {
 	public final static String PHONENUMBER = "Phonenumber";
 	public final static String BIRTHDATE = "Birth date";
 	public final static String MONTHLY_INCOME = "Monthly income";
+	public final static String FINISH_REGISTER_MESSAGE = "The registration was successful, now your request has been forwarded to the bank manager :)";
 
+	// BANK MANAGER MENU
+	public final static String APPROVE_NEW_ACCOUNTS = "Approve new accounts";
+
+	// PAY BILL MENU
+	public final static String BANK = "BANK - Loan return";
+	public final static String PHONE_COMPANY = "Phone company";
+	public final static String WATER_COMPANY = "Water company";
+	public final static String ELECTRIC_COMPANY = "Electric company";
+
+	
 	public static void printMenu() {
 		System.out.println(SELECTION_ACTIVITY);
 		System.out.println("1 - " + CHECK_BALANCE);
@@ -57,4 +68,16 @@ public abstract class Menu {
 		System.out.println("1 - " + LOGIN_WITH_USERNAME_AND_PASSWORD);
 		System.out.println("2 - " + LOGIN_WITH_PHONENUMBER);
 	}
+	
+	public static void printBankManagerMenu() {
+		System.out.println("9 - " + APPROVE_NEW_ACCOUNTS);
+	}
+	
+	public static void printPayBillOptions() {
+		System.out.println("1 - " + BANK);
+		System.out.println("2 - " + PHONE_COMPANY);
+		System.out.println("3 - " + WATER_COMPANY);
+		System.out.println("4 - " + ELECTRIC_COMPANY);
+	}
+	
 }

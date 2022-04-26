@@ -11,6 +11,7 @@ public class Runner {
 	protected static BankDB bankDB = new BankDB();
 	protected static int selection = -1;
 	protected static final int MAX_AMOUNT_TO_TRANSFER = 2000;
+	protected static final int MAX_AMOUNT_TO_PAY_BILL = 5000;
 
 	public static void main(String[] args) {
 		String username, password, phonenumber;
@@ -19,6 +20,7 @@ public class Runner {
 
 		bankDB.bankManager.addUserToApprove(bankDB.acOwner1);
 		bankDB.appManager.addAccountOwnerToArray(bankDB.acOwner1);
+		bankDB.appManager.addAccountOwnerToArray(bankDB.bankManager);
 		bankDB.bankManager.setAndApproveAcc();
 
 //		boolean isLoginByUsernameAndPass = (bankDB.appManager).login("Bambi", "Dana");
@@ -72,7 +74,7 @@ public class Runner {
 			}
 			case 2: { // OPEN ACCOUNT
 				bankDB.appManager.openAccount();
-				handleMenu();
+				System.out.println(Menu.FINISH_REGISTER_MESSAGE);
 				break;
 			}
 			}
@@ -85,6 +87,9 @@ public class Runner {
 		double amount;
 
 		Menu.printMenu();
+		if (bankDB.appManager.currUser.equals(bankDB.bankManager))
+			Menu.printBankManagerMenu();
+
 		selection = scanner.nextInt();
 		while (selection != 0) {
 			switch (selection) {
@@ -114,7 +119,7 @@ public class Runner {
 				break;
 			}
 			case 6: { // PAY_BILL
-
+				handlePayBill();
 				break;
 			}
 			case 7: { // WITHDRAWAL_FEE_COLLECTION
@@ -127,10 +132,45 @@ public class Runner {
 			case 0: { // EXIT
 				break;
 			}
+			case 9: { // APPROVE_NEW_ACCOUNTS
+				bankDB.bankManager.setAndApproveAcc();
+				System.out.println("Approval new accounts successfully");
+				break;
+			}
 			}
 			Menu.printMenu();
+			if (bankDB.appManager.currUser.equals(bankDB.bankManager))
+				Menu.printBankManagerMenu();
 			selection = scanner.nextInt();
 		}
+	}
+
+	private static void handlePayBill() {
+		Menu.printPayBillOptions();
+		int selection = scanner.nextInt();
+
+		System.out.println("Amount: ");
+		double amount = scanner.nextDouble();
+
+		if (amount > MAX_AMOUNT_TO_PAY_BILL)
+			return;
+
+		switch (selection) {
+		case 1: { // BANK
+			bankDB.bankManager.deposit(amount);
+			bankDB.appManager.currUser.withdrawal(amount);
+			System.out.println("Pay bill succeeded!");
+			break;
+		}
+		case 2: // PHONE_COMPANY
+		case 3: // WATER_COMPANY
+		case 4: { // ELECTRIC_COMPANY
+			bankDB.appManager.currUser.withdrawal(amount);
+			System.out.println("Pay bill succeeded!");
+			break;
+		}
+		}
+
 	}
 
 	private static void transferFunds() {
