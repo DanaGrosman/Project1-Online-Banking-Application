@@ -12,12 +12,10 @@ public class Cerdetianls {
 	}
 	
 	public void setUsername(String username) {
-		// TODO check validation
 		this.username = username;
 	}
 	
 	public void setPassword(String password) {
-		// TODO check validation
 		this.password = password;
 	}
 

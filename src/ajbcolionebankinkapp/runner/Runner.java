@@ -3,6 +3,8 @@ package ajbcolionebankinkapp.runner;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 
+import ajbcolionebankinkapp.account.Account;
+import ajbcolionebankinkapp.enumaretion.ActivityName;
 import ajbcolionebankinkapp.users.AccountOwner;
 import ajbcolionebankinkapp.users.PhoneNumber;
 
@@ -22,15 +24,7 @@ public class Runner {
 		bankDB.appManager.addAccountOwnerToArray(bankDB.acOwner1);
 		bankDB.appManager.addAccountOwnerToArray(bankDB.bankManager);
 		bankDB.bankManager.setAndApproveAcc();
-
-//		boolean isLoginByUsernameAndPass = (bankDB.appManager).login("Bambi", "Dana");
-//		boolean isLoginByPhonenumber = (bankDB.appManager).login(new PhoneNumber(052, 6998773));
-//
-		// OPEN ACCOUNT
-//		(bankDB.appManager).openAccount();
-//		
-//		// Deposit 
-//		bankDB.acOwner1.deposit(500);
+		bankDB.bankManager.setAccount(new Account());
 
 		Menu.printLogin();
 		selection = scanner.nextInt();
@@ -84,8 +78,6 @@ public class Runner {
 	}
 
 	private static void handleMenu() {
-		double amount;
-
 		Menu.printMenu();
 		if (bankDB.appManager.currUser.equals(bankDB.bankManager))
 			Menu.printBankManagerMenu();
@@ -94,45 +86,41 @@ public class Runner {
 		while (selection != 0) {
 			switch (selection) {
 			case 1: { // CHECK_BALANCE
-				System.out.println("Balance: " + bankDB.appManager.currUser.checkBalance());
+				handleCheckBalance();
 				break;
 			}
 			case 2: // DEPOSIT_CASH
 			case 3: { // DEPOSIT_CHECK
-				System.out.println("Amount: ");
-				amount = scanner.nextDouble();
-				bankDB.appManager.currUser.deposit(amount);
-				System.out.println("Deposit succeeded!");
-				System.out.println("Your new balance: " + bankDB.appManager.currUser.checkBalance());
+				handleDesposit();
 				break;
 			}
 			case 4: { // WITHDRAWAL_CASH
-				System.out.println("Amount: ");
-				amount = scanner.nextDouble();
-				bankDB.appManager.currUser.withdrawal(amount);
-				System.out.println("Withdrawal succeeded!");
-				System.out.println("Your new balance: " + bankDB.appManager.currUser.checkBalance());
+				handleWithdrawal();
 				break;
 			}
 			case 5: { // TRANSFER_FUNDS
-				transferFunds();
+				handleTransferFunds();
 				break;
 			}
 			case 6: { // PAY_BILL
 				handlePayBill();
 				break;
 			}
-			case 7: { // WITHDRAWAL_FEE_COLLECTION
+			case 7: { // GET_LOAN
 				break;
 			}
-			case 8: { // LOGOUT
+			case 8: { // GET_REPORT
+				handleGetReport();
+				break;
+			}
+			case 9: { // LOGOUT
 				bankDB.appManager.logout();
 				return;
 			}
 			case 0: { // EXIT
 				break;
 			}
-			case 9: { // APPROVE_NEW_ACCOUNTS
+			case 10: { // APPROVE_NEW_ACCOUNTS
 				bankDB.bankManager.setAndApproveAcc();
 				System.out.println("Approval new accounts successfully");
 				break;
@@ -143,6 +131,31 @@ public class Runner {
 				Menu.printBankManagerMenu();
 			selection = scanner.nextInt();
 		}
+	}
+
+	private static void handleGetReport() {
+		bankDB.appManager.currUser.getAccount().printHistory();
+	}
+
+	private static void handleCheckBalance() {
+		System.out.println("Balance: " + bankDB.appManager.currUser.checkBalance());	
+	}
+
+	private static void handleWithdrawal() {
+		System.out.println("Amount: ");
+		double amount = scanner.nextDouble();
+		bankDB.appManager.currUser.withdrawal(amount);
+		System.out.println("Withdrawal succeeded!");
+		System.out.println("Your new balance: " + bankDB.appManager.currUser.checkBalance());		
+	}
+
+	private static void handleDesposit() {
+		System.out.println("Amount: ");
+		double amount = scanner.nextDouble();
+		bankDB.appManager.currUser.deposit(amount);
+		System.out.println("Deposit succeeded!");
+		System.out.println("Your new balance: " + bankDB.appManager.currUser.checkBalance());	
+		bankDB.appManager.currUser.getAccount().addActivityData(ActivityName.DEPOSIT, amount, LocalDateTime.now(), "Succeeded");
 	}
 
 	private static void handlePayBill() {
@@ -160,6 +173,7 @@ public class Runner {
 			bankDB.bankManager.deposit(amount);
 			bankDB.appManager.currUser.withdrawal(amount);
 			System.out.println("Pay bill succeeded!");
+			System.out.println("Balance: " + bankDB.appManager.currUser.checkBalance());
 			break;
 		}
 		case 2: // PHONE_COMPANY
@@ -167,13 +181,14 @@ public class Runner {
 		case 4: { // ELECTRIC_COMPANY
 			bankDB.appManager.currUser.withdrawal(amount);
 			System.out.println("Pay bill succeeded!");
+			System.out.println("Balance: " + bankDB.appManager.currUser.checkBalance());
 			break;
 		}
 		}
 
 	}
 
-	private static void transferFunds() {
+	private static void handleTransferFunds() {
 		System.out.println("Reciving user phone number: ");
 		String phone = scanner.next();
 		PhoneNumber phoneNumber = bankDB.appManager.parseStringToPhonenumber(phone);

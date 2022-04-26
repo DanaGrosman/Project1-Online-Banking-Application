@@ -8,7 +8,8 @@ public abstract class Menu {
 	public final static String WITHDRAWAL_CASH = "Withdrawal of cash";
 	public final static String PAY_BILL = "Pay bill";
 	public final static String TRANSFER_FUNDS = "Transfer funds";
-	public final static String WITHDRAWAL_FEE_COLLECTION = "Withdrawal fee collection";
+	public final static String GET_LOAN = "Get Loan";
+	public final static String GET_REPORT = "Get report";
 	public final static String OPEN_ACCOUNT = "Open account";
 	public final static String EXIT = "Exit";
 
@@ -52,8 +53,9 @@ public abstract class Menu {
 		System.out.println("4 - " + WITHDRAWAL_CASH);
 		System.out.println("5 - " + TRANSFER_FUNDS);
 		System.out.println("6 - " + PAY_BILL);
-		System.out.println("7 - " + WITHDRAWAL_FEE_COLLECTION);
-		System.out.println("8 - " + LOGOUT);
+		System.out.println("7 - " + GET_LOAN);
+		System.out.println("8 - " + GET_REPORT);
+		System.out.println("9 - " + LOGOUT);
 		System.out.println("0 - " + EXIT);
 	}
 
@@ -70,7 +72,7 @@ public abstract class Menu {
 	}
 	
 	public static void printBankManagerMenu() {
-		System.out.println("9 - " + APPROVE_NEW_ACCOUNTS);
+		System.out.println("10 - " + APPROVE_NEW_ACCOUNTS);
 	}
 	
 	public static void printPayBillOptions() {
