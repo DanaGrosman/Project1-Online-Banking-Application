@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
+import ajbcolionebankinkapp.actions.CheckBalance;
+import ajbcolionebankinkapp.actions.Deposit;
 import ajbcolionebankinkapp.enumaretion.ActivityName;
 import ajbcolionebankinkapp.runner.Menu;
 import ajbcolionebankinkapp.users.AccountOwner;
@@ -81,12 +83,12 @@ public class AppManager {
 		while (selection != 0) {
 			switch (selection) {
 			case 1: { // CHECK_BALANCE
-				handleCheckBalance();
+				(new CheckBalance(getCurrUser())).run();
 				break;
 			}
 			case 2: // DEPOSIT_CASH
 			case 3: { // DEPOSIT_CHECK
-				handleDesposit();
+				(new Deposit(getCurrUser())).run();
 				break;
 			}
 			case 4: { // WITHDRAWAL_CASH
@@ -135,11 +137,11 @@ public class AppManager {
 
 	private void handleAccountDetails() {
 		System.out.println(getCurrUser().toString());
-		System.out.println(getCurrUser().getAccount().toString());		
+		System.out.println(getCurrUser().getAccount().toString());
 	}
 
 	private void handleGetReport() {
-		getCurrUser().getAccount().printHistory();		
+		getCurrUser().getAccount().printHistory();
 	}
 
 	private void handleGetLoan() {
@@ -156,21 +158,17 @@ public class AppManager {
 		} else if (monthlyPayments > MAX_MONTHLY_PAYMENT) {
 			activityInfo = "Failed to get loan - over the maximum monthly payment";
 		} else {
-			double interestRate = getCurrUser().getAccount().getAccountProperties()
-					.getInterestRateMin();
+			double interestRate = getCurrUser().getAccount().getAccountProperties().getInterestRateMin();
 			double monthlyPaymentReturn = ((amount * (interestRate / 100)) + amount) / monthlyPayments;
 			System.out.println("Monthly payment return: " + monthlyPaymentReturn);
 			bankManager.withdrawal(amount);
 			getCurrUser().deposit(amount);
-			getCurrUser().getAccount().addActivityData(ActivityName.DEPOSIT, amount,
-					LocalDateTime.now(), "Get loan");
-			bankManager.getAccount().addActivityData(ActivityName.WITHDRAWAL, amount, LocalDateTime.now(),
-					"Give loan");
+			getCurrUser().getAccount().addActivityData(ActivityName.DEPOSIT, amount, LocalDateTime.now(), "Get loan");
+			bankManager.getAccount().addActivityData(ActivityName.WITHDRAWAL, amount, LocalDateTime.now(), "Give loan");
 			activityInfo = "Get loan succeeded";
 		}
 		System.out.println(activityInfo);
-		getCurrUser().getAccount().addActivityData(ActivityName.GET_LOAN, amount, LocalDateTime.now(),
-				activityInfo);		
+		getCurrUser().getAccount().addActivityData(ActivityName.GET_LOAN, amount, LocalDateTime.now(), activityInfo);
 	}
 
 	private void handlePayBill() {
@@ -209,7 +207,7 @@ public class AppManager {
 		System.out.printf("Pay bill to %s succeeded!\n", target);
 		System.out.println("Balance: " + getCurrUser().checkBalance());
 		getCurrUser().getAccount().addActivityData(ActivityName.PAY_BILL, amount, LocalDateTime.now(),
-				"Pay bill to " + target + " succeeded");		
+				"Pay bill to " + target + " succeeded");
 	}
 
 	private void handleTransferFunds() {
@@ -241,8 +239,7 @@ public class AppManager {
 		}
 
 		System.out.println(output);
-		getCurrUser().getAccount().addActivityData(ActivityName.TRANSFER, amount, LocalDateTime.now(),
-				activityInfo);		
+		getCurrUser().getAccount().addActivityData(ActivityName.TRANSFER, amount, LocalDateTime.now(), activityInfo);
 	}
 
 	private void handleWithdrawal() {
@@ -260,42 +257,9 @@ public class AppManager {
 			activityInfo = "Withdrawal failed - over the daily maximum withdrawal";
 		}
 		System.out.println(activityInfo);
-		getCurrUser().getAccount().addActivityData(ActivityName.WITHDRAWAL, amount,
-				LocalDateTime.now(), activityInfo);		
+		getCurrUser().getAccount().addActivityData(ActivityName.WITHDRAWAL, amount, LocalDateTime.now(), activityInfo);
 	}
 
-	private void handleDesposit() {
-		System.out.println("Amount: ");
-		double amount = scanner.nextDouble();
-		getCurrUser().deposit(amount);
-		System.out.println("Deposit succeeded!");
-		System.out.println("Your new balance: " + getCurrUser().checkBalance());
-		getCurrUser().getAccount().addActivityData(ActivityName.DEPOSIT, amount, LocalDateTime.now(), "Succeeded");
-	}
-
-//	public boolean login(String username, String password) {
-//		Cerdetianls cerdetianlsToCheck = new Cerdetianls(username, password);
-//		for (int i = 0; i < nextIndexAvaliableInUsersArray; i++) {
-//			if (cerdetianlsToCheck.equals(users[i].getCerdetianls())) {
-//				setCurrUser(users[i]);
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-
-//	public boolean login(PhoneNumber phoneNumberToCheck) {
-//		AccountOwner accountOwner = getOwnerByPhoneNumber(phoneNumberToCheck);
-//		if (accountOwner != null) {
-//			setCurrUser(accountOwner);
-//			return true;
-//		}
-//		return false;
-//	}
-
-	private void handleCheckBalance() {
-		System.out.println("Balance: " + getCurrUser().checkBalance());
-	}
 
 	public AccountOwner getOwnerByPhoneNumber(PhoneNumber phoneNumberToCheck) {
 		AccountOwner accountOwner = null;
