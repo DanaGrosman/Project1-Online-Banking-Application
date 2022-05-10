@@ -83,5 +83,4 @@ public abstract class Menu {
 		System.out.println("3 - " + WATER_COMPANY);
 		System.out.println("4 - " + ELECTRIC_COMPANY);
 	}
-	
 }

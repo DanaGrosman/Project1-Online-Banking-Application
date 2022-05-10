@@ -12,6 +12,7 @@ import ajbcolionebankinkapp.enumaretion.ActivityName;
 public class BankManager extends AccountOwner {
 	protected final int NUM_OF_USERS = 100;
 	protected AccountOwner[] usersToApprove = new AccountOwner[NUM_OF_USERS];
+	protected AccountOwner[] users = new AccountOwner[NUM_OF_USERS];
 
 	public BankManager(String firstName, String lastName, PhoneNumber phoneNumber, LocalDate birthDate,
 			Cerdetianls cerdetianls) {

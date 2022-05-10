@@ -1,45 +1,300 @@
 package ajbcolionebankinkapp.appmanager;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
+import ajbcolionebankinkapp.enumaretion.ActivityName;
+import ajbcolionebankinkapp.runner.Menu;
 import ajbcolionebankinkapp.users.AccountOwner;
 import ajbcolionebankinkapp.users.BankManager;
 import ajbcolionebankinkapp.users.Cerdetianls;
 import ajbcolionebankinkapp.users.PhoneNumber;
 
 public class AppManager {
-	protected final static int NUM_OF_USERS = 100;
+	protected static final int MAX_AMOUNT_TO_TRANSFER = 2000;
+	protected static final int MAX_AMOUNT_TO_PAY_BILL = 5000;
+	protected static final int MAX_MONTHLY_PAYMENT = 6;
 	protected static int nextIndexAvaliableInUsersArray = 0;
-	protected Scanner scanner = new Scanner(System.in);
-	protected AccountOwner currUser;
+	protected final static int NUM_OF_USERS = 100;
 	public static AccountOwner[] users = new AccountOwner[NUM_OF_USERS];
+	protected static Scanner scanner = new Scanner(System.in);
+
+	protected int selection = -1;
+	protected AccountOwner currUser;
 	protected BankManager bankManager;
+	protected Menu menu;
 
 	public AppManager(BankManager bankManager) {
 		this.currUser = null;
 		this.bankManager = bankManager;
 	}
 
-	public boolean login(String username, String password) {
-		Cerdetianls cerdetianlsToCheck = new Cerdetianls(username, password);
-		for (int i = 0; i < nextIndexAvaliableInUsersArray; i++) {
-			if (cerdetianlsToCheck.equals(users[i].getCerdetianls())) {
-				setCurrUser(users[i]);
-				return true;
+	public void runApp() {
+		Menu.printLogin();
+		selection = scanner.nextInt();
+
+		while (selection != 0) {
+			switch (selection) {
+			case 1: { // LOGIN
+				Menu.printLoginOptions();
+				selection = scanner.nextInt();
+				handleLogin(selection);
+				break;
 			}
+			case 2: { // OPEN ACCOUNT
+				openAccount();
+				System.out.println(Menu.FINISH_REGISTER_MESSAGE);
+				break;
+			}
+			}
+
+			Menu.printLogin();
+			selection = scanner.nextInt();
 		}
-		return false;
 	}
 
-	public boolean login(PhoneNumber phoneNumberToCheck) {
-		AccountOwner accountOwner = getOwnerByPhoneNumber(phoneNumberToCheck);
-		if (accountOwner != null) {
-			setCurrUser(accountOwner);
-			return true;
+	private void handleLogin(int selection) {
+		Login login = new Login(this);
+
+		switch (selection) {
+		case 1: { // LOGIN_WITH_USERNAME_AND_PASSWORD
+			if (login.loginWithUsernameAndPassword())
+				handleMenu();
+			break;
 		}
-		return false;
+		case 2: { // LOGIN_WITH_PHONENUMBER
+			login.loginWithPhoneNumber();
+			handleMenu();
+			break;
+		}
+		}
+	}
+
+	private void handleMenu() {
+		Menu.printMenu();
+		if (getCurrUser().equals(bankManager))
+			Menu.printBankManagerMenu();
+
+		selection = scanner.nextInt();
+		while (selection != 0) {
+			switch (selection) {
+			case 1: { // CHECK_BALANCE
+				handleCheckBalance();
+				break;
+			}
+			case 2: // DEPOSIT_CASH
+			case 3: { // DEPOSIT_CHECK
+				handleDesposit();
+				break;
+			}
+			case 4: { // WITHDRAWAL_CASH
+				handleWithdrawal();
+				break;
+			}
+			case 5: { // TRANSFER_FUNDS
+				handleTransferFunds();
+				break;
+			}
+			case 6: { // PAY_BILL
+				handlePayBill();
+				break;
+			}
+			case 7: { // GET_LOAN
+				handleGetLoan();
+				break;
+			}
+			case 8: { // GET_REPORT
+				handleGetReport();
+				break;
+			}
+			case 9: { // LOGOUT
+				logout();
+				return;
+			}
+			case 10: { // ACCOUNT_DETAILS
+				handleAccountDetails();
+				break;
+			}
+			case 0: { // EXIT
+				break;
+			}
+			case 11: { // APPROVE_NEW_ACCOUNTS
+				bankManager.setAndApproveAcc();
+				System.out.println("Approval new accounts successfully");
+				break;
+			}
+			}
+			Menu.printMenu();
+			if (getCurrUser().equals(bankManager))
+				Menu.printBankManagerMenu();
+			selection = scanner.nextInt();
+		}
+	}
+
+	private void handleAccountDetails() {
+		System.out.println(getCurrUser().toString());
+		System.out.println(getCurrUser().getAccount().toString());		
+	}
+
+	private void handleGetReport() {
+		getCurrUser().getAccount().printHistory();		
+	}
+
+	private void handleGetLoan() {
+		String activityInfo = "";
+
+		System.out.println("Loan amount: ");
+		double amount = scanner.nextDouble();
+		System.out.println("Monthly payments: ");
+		int monthlyPayments = scanner.nextInt();
+
+		double maxLoanAmount = getCurrUser().getAccount().getAccountProperties().getMaxLoan();
+		if (amount > maxLoanAmount && maxLoanAmount != 0) {
+			activityInfo = "Failed to get loan - over the maximum amount";
+		} else if (monthlyPayments > MAX_MONTHLY_PAYMENT) {
+			activityInfo = "Failed to get loan - over the maximum monthly payment";
+		} else {
+			double interestRate = getCurrUser().getAccount().getAccountProperties()
+					.getInterestRateMin();
+			double monthlyPaymentReturn = ((amount * (interestRate / 100)) + amount) / monthlyPayments;
+			System.out.println("Monthly payment return: " + monthlyPaymentReturn);
+			bankManager.withdrawal(amount);
+			getCurrUser().deposit(amount);
+			getCurrUser().getAccount().addActivityData(ActivityName.DEPOSIT, amount,
+					LocalDateTime.now(), "Get loan");
+			bankManager.getAccount().addActivityData(ActivityName.WITHDRAWAL, amount, LocalDateTime.now(),
+					"Give loan");
+			activityInfo = "Get loan succeeded";
+		}
+		System.out.println(activityInfo);
+		getCurrUser().getAccount().addActivityData(ActivityName.GET_LOAN, amount, LocalDateTime.now(),
+				activityInfo);		
+	}
+
+	private void handlePayBill() {
+		String target = "";
+
+		Menu.printPayBillOptions();
+		int selection = scanner.nextInt();
+
+		System.out.println("Amount: ");
+		double amount = scanner.nextDouble();
+
+		if (amount > MAX_AMOUNT_TO_PAY_BILL)
+			return;
+
+		switch (selection) {
+		case 1: { // BANK
+			bankManager.deposit(amount);
+			target = "Bank";
+			break;
+		}
+		case 2: { // PHONE_COMPANY
+			target = "Phone company";
+			break;
+		}
+		case 3: {// WATER_COMPANY
+			target = "Water company";
+			break;
+		}
+		case 4: { // ELECTRIC_COMPANY
+			target = "Electric company";
+			break;
+		}
+		}
+
+		getCurrUser().withdrawal(amount);
+		System.out.printf("Pay bill to %s succeeded!\n", target);
+		System.out.println("Balance: " + getCurrUser().checkBalance());
+		getCurrUser().getAccount().addActivityData(ActivityName.PAY_BILL, amount, LocalDateTime.now(),
+				"Pay bill to " + target + " succeeded");		
+	}
+
+	private void handleTransferFunds() {
+		String activityInfo = "";
+		String output = "";
+
+		System.out.println("Reciving user phone number: ");
+		String phone = scanner.next();
+		PhoneNumber phoneNumber = parseStringToPhonenumber(phone);
+
+		System.out.println("Amount: ");
+		double amount = scanner.nextDouble();
+
+		if (amount > MAX_AMOUNT_TO_TRANSFER) {
+			output = "The maximum amount that can be transferred is " + MAX_AMOUNT_TO_TRANSFER;
+			activityInfo = "Failed to transfer funds - over the maximum amount";
+		}
+
+		AccountOwner accountOwnerTarget = getOwnerByPhoneNumber(phoneNumber);
+		if (accountOwnerTarget == null) {
+			output = "The phone number dosent found";
+			activityInfo = "Failed to transfer funds - Phone number dosen't found";
+		} else {
+			getCurrUser().withdrawal(amount);
+			accountOwnerTarget.deposit(amount);
+			output = "Transfer succeeded!";
+			System.out.println("Your new balance: " + getCurrUser().checkBalance());
+			activityInfo = "Transfer funds to " + phone + " succeeded";
+		}
+
+		System.out.println(output);
+		getCurrUser().getAccount().addActivityData(ActivityName.TRANSFER, amount, LocalDateTime.now(),
+				activityInfo);		
+	}
+
+	private void handleWithdrawal() {
+		String activityInfo = "";
+
+		System.out.println("Amount: ");
+		double amount = scanner.nextDouble();
+
+		double maxWithdrawal = getCurrUser().getAccount().getAccountProperties().getMaxWithdrawal();
+		if (amount <= maxWithdrawal || maxWithdrawal == 0) {
+			getCurrUser().withdrawal(amount);
+			System.out.println("Your new balance: " + getCurrUser().checkBalance());
+			activityInfo = "Withdrawal succeeded";
+		} else {
+			activityInfo = "Withdrawal failed - over the daily maximum withdrawal";
+		}
+		System.out.println(activityInfo);
+		getCurrUser().getAccount().addActivityData(ActivityName.WITHDRAWAL, amount,
+				LocalDateTime.now(), activityInfo);		
+	}
+
+	private void handleDesposit() {
+		System.out.println("Amount: ");
+		double amount = scanner.nextDouble();
+		getCurrUser().deposit(amount);
+		System.out.println("Deposit succeeded!");
+		System.out.println("Your new balance: " + getCurrUser().checkBalance());
+		getCurrUser().getAccount().addActivityData(ActivityName.DEPOSIT, amount, LocalDateTime.now(), "Succeeded");
+	}
+
+//	public boolean login(String username, String password) {
+//		Cerdetianls cerdetianlsToCheck = new Cerdetianls(username, password);
+//		for (int i = 0; i < nextIndexAvaliableInUsersArray; i++) {
+//			if (cerdetianlsToCheck.equals(users[i].getCerdetianls())) {
+//				setCurrUser(users[i]);
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
+
+//	public boolean login(PhoneNumber phoneNumberToCheck) {
+//		AccountOwner accountOwner = getOwnerByPhoneNumber(phoneNumberToCheck);
+//		if (accountOwner != null) {
+//			setCurrUser(accountOwner);
+//			return true;
+//		}
+//		return false;
+//	}
+
+	private void handleCheckBalance() {
+		System.out.println("Balance: " + getCurrUser().checkBalance());
 	}
 
 	public AccountOwner getOwnerByPhoneNumber(PhoneNumber phoneNumberToCheck) {
@@ -183,4 +438,5 @@ public class AppManager {
 	public AccountOwner[] getUsers() {
 		return users;
 	}
+
 }
