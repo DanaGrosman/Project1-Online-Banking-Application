@@ -26,7 +26,7 @@ public abstract class Menu {
 	public final static String PASSWORD = "Password";
 	public final static String LOGIN_WITH_USERNAME_AND_PASSWORD = "Login in with username and password";
 	public final static String LOGIN_WITH_PHONENUMBER = "Login in phonenumber";
-	public final static String USER_IS_BLOCKED = "The account is blockted for 30 minutes";
+	public final static String USER_IS_BLOCKED = "The account is blocked for 30 minutes";
 
 	// OPEN ACCOUNT
 	public final static String FIRST_NAME = "First name";

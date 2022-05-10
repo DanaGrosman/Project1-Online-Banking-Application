@@ -116,7 +116,7 @@ public class Runner {
 			}
 			case 9: { // LOGOUT
 				bankDB.appManager.logout();
-				break;
+				return;
 			}
 			case 10: { // ACCOUNT_DETAILS
 				handleAccountDetails();

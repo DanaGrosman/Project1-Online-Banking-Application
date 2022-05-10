@@ -62,7 +62,6 @@ public class AppManager {
 
 	public void logout() {
 		setCurrUser(null);
-		;
 	}
 
 	public boolean openAccount() {
