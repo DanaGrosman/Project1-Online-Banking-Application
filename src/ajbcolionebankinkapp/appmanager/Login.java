@@ -58,11 +58,11 @@ public class Login {
 		System.out.println(Menu.PHONENUMBER);
 		String phonenumber = scanner.next();
 		
-		return login(appManager.parseStringToPhonenumber(phonenumber)) ? true : false;
+		return login(Utils.parseStringToPhonenumber(phonenumber)) ? true : false;
 	}
 
 	private boolean login(PhoneNumber phoneNumberToCheck) {
-		AccountOwner accountOwner = appManager.getOwnerByPhoneNumber(phoneNumberToCheck);
+		AccountOwner accountOwner = AppManager.getOwnerByPhoneNumber(phoneNumberToCheck);
 		if (accountOwner != null) {
 			appManager.setCurrUser(accountOwner);
 			return true;

@@ -7,6 +7,8 @@ import java.util.Scanner;
 
 import ajbcolionebankinkapp.actions.CheckBalance;
 import ajbcolionebankinkapp.actions.Deposit;
+import ajbcolionebankinkapp.actions.TransferFunds;
+import ajbcolionebankinkapp.actions.Withdrawal;
 import ajbcolionebankinkapp.enumaretion.ActivityName;
 import ajbcolionebankinkapp.runner.Menu;
 import ajbcolionebankinkapp.users.AccountOwner;
@@ -15,7 +17,6 @@ import ajbcolionebankinkapp.users.Cerdetianls;
 import ajbcolionebankinkapp.users.PhoneNumber;
 
 public class AppManager {
-	protected static final int MAX_AMOUNT_TO_TRANSFER = 2000;
 	protected static final int MAX_AMOUNT_TO_PAY_BILL = 5000;
 	protected static final int MAX_MONTHLY_PAYMENT = 6;
 	protected static int nextIndexAvaliableInUsersArray = 0;
@@ -92,31 +93,31 @@ public class AppManager {
 				break;
 			}
 			case 4: { // WITHDRAWAL_CASH
-				handleWithdrawal();
+				(new Withdrawal(getCurrUser())).run();
 				break;
 			}
 			case 5: { // TRANSFER_FUNDS
-				handleTransferFunds();
+				(new TransferFunds(getCurrUser())).run();
 				break;
 			}
 			case 6: { // PAY_BILL
-				handlePayBill();
+				handlePayBill(); // TODO
 				break;
 			}
 			case 7: { // GET_LOAN
-				handleGetLoan();
+				handleGetLoan(); // TODO
 				break;
 			}
 			case 8: { // GET_REPORT
-				handleGetReport();
+				handleGetReport(); // TODO
 				break;
 			}
 			case 9: { // LOGOUT
-				logout();
+				logout(); // TODO
 				return;
 			}
 			case 10: { // ACCOUNT_DETAILS
-				handleAccountDetails();
+				handleAccountDetails(); // TODO
 				break;
 			}
 			case 0: { // EXIT
@@ -210,58 +211,7 @@ public class AppManager {
 				"Pay bill to " + target + " succeeded");
 	}
 
-	private void handleTransferFunds() {
-		String activityInfo = "";
-		String output = "";
-
-		System.out.println("Reciving user phone number: ");
-		String phone = scanner.next();
-		PhoneNumber phoneNumber = parseStringToPhonenumber(phone);
-
-		System.out.println("Amount: ");
-		double amount = scanner.nextDouble();
-
-		if (amount > MAX_AMOUNT_TO_TRANSFER) {
-			output = "The maximum amount that can be transferred is " + MAX_AMOUNT_TO_TRANSFER;
-			activityInfo = "Failed to transfer funds - over the maximum amount";
-		}
-
-		AccountOwner accountOwnerTarget = getOwnerByPhoneNumber(phoneNumber);
-		if (accountOwnerTarget == null) {
-			output = "The phone number dosent found";
-			activityInfo = "Failed to transfer funds - Phone number dosen't found";
-		} else {
-			getCurrUser().withdrawal(amount);
-			accountOwnerTarget.deposit(amount);
-			output = "Transfer succeeded!";
-			System.out.println("Your new balance: " + getCurrUser().checkBalance());
-			activityInfo = "Transfer funds to " + phone + " succeeded";
-		}
-
-		System.out.println(output);
-		getCurrUser().getAccount().addActivityData(ActivityName.TRANSFER, amount, LocalDateTime.now(), activityInfo);
-	}
-
-	private void handleWithdrawal() {
-		String activityInfo = "";
-
-		System.out.println("Amount: ");
-		double amount = scanner.nextDouble();
-
-		double maxWithdrawal = getCurrUser().getAccount().getAccountProperties().getMaxWithdrawal();
-		if (amount <= maxWithdrawal || maxWithdrawal == 0) {
-			getCurrUser().withdrawal(amount);
-			System.out.println("Your new balance: " + getCurrUser().checkBalance());
-			activityInfo = "Withdrawal succeeded";
-		} else {
-			activityInfo = "Withdrawal failed - over the daily maximum withdrawal";
-		}
-		System.out.println(activityInfo);
-		getCurrUser().getAccount().addActivityData(ActivityName.WITHDRAWAL, amount, LocalDateTime.now(), activityInfo);
-	}
-
-
-	public AccountOwner getOwnerByPhoneNumber(PhoneNumber phoneNumberToCheck) {
+	public static AccountOwner getOwnerByPhoneNumber(PhoneNumber phoneNumberToCheck) {
 		AccountOwner accountOwner = null;
 		for (int i = 0; i < nextIndexAvaliableInUsersArray; i++) {
 			if (phoneNumberToCheck.equals(users[i].getPhoneNumber())) {
@@ -368,21 +318,17 @@ public class AppManager {
 
 	private PhoneNumber handlePhoneNumber(String phone) {
 		boolean phoneIsExists = true;
-		PhoneNumber phoneNumber = parseStringToPhonenumber(phone);
+		PhoneNumber phoneNumber = Utils.parseStringToPhonenumber(phone);
 		phoneIsExists = checkIfPhoneNumberIsAlreadyExists(phoneNumber);
 
 		while (phoneIsExists) {
 			System.out.println("PhoneNuber is already exists. \nPlease enter another phonenumber: ");
 			phone = scanner.nextLine();
-			phoneNumber = parseStringToPhonenumber(phone);
+			phoneNumber = Utils.parseStringToPhonenumber(phone);
 			phoneIsExists = checkIfPhoneNumberIsAlreadyExists(phoneNumber);
 		}
 
 		return phoneNumber;
-	}
-
-	public PhoneNumber parseStringToPhonenumber(String phone) {
-		return new PhoneNumber(Integer.parseInt(phone.substring(0, 3)), Integer.parseInt(phone.substring(3, 10)));
 	}
 
 	private LocalDate handleBirthDate(String birthday) {
